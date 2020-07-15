@@ -38,5 +38,6 @@ func GetConnection() *mongo.Client {
 		log.Fatal(err)
 		return nil
 	}
+
 	return client
 }
