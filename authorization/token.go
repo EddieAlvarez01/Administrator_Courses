@@ -38,7 +38,7 @@ func VerifyToken(next http.Handler) http.Handler {
 		}
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodRS256); !ok {
-
+				return nil, 
 			}
 		})
 	})

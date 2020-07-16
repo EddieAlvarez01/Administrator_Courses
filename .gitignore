@@ -16,3 +16,6 @@
 
 #configuration json database
 configuration.json
+
+#private key jwt
+/certificates/app.rsa
