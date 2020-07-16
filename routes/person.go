@@ -12,4 +12,6 @@ import (
 func RegisterRoutesPersons(mux *mux.Router, person interfaces.PersonDao) {
 	handler := handlers.NewPersonHandler(person)
 	mux.HandleFunc("/persons", handler.CreatePerson).Methods(http.MethodPost)
+	mux.HandleFunc("/persons/{id}", handler.GetOne).Methods(http.MethodGet)
+	mux.HandleFunc("/persons/signin", handler.SignIn).Methods(http.MethodPost)
 }
