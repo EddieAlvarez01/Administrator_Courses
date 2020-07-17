@@ -1,8 +1,8 @@
 package authorization
 
 import (
+	"errors"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/EddieAlvarez01/administrator_courses/models"
@@ -29,17 +29,18 @@ func GenerateToken(payload models.Person) (string, error) {
 }
 
 //VerifyToken MIDDLEWARE VERIFY TOKEN
-func VerifyToken(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenString := r.Header.Get("x-access-token")
-		if tokenString == "" {
-			models.NewResponseJSON(w, http.StatusUnauthorized, "Token no provided", nil)
-			return
+func VerifyToken(tokenString string) (models.Payload, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodRS256); !ok {
-				return nil, 
-			}
-		})
+		return verifyKey, nil
 	})
+	if err != nil {
+		return models.Payload{}, err
+	}
+	if payload, ok := token.Claims.(models.Payload); ok && token.Valid {
+		return payload, nil
+	}
+	return models.Payload{}, errors.New("Invalid token")
 }
