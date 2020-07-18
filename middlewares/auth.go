@@ -23,3 +23,16 @@ func Authenticate(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
+
+func RoleAdministrator(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		payload := r.Context().Value("payload").(models.Payload)
+		for _, role := range payload.Role {
+			if role == "ADMIN" {
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+		models.NewResponseJSON(w, http.StatusForbidden, "Access denied", nil)
+	})
+}

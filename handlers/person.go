@@ -10,6 +10,7 @@ import (
 
 	"github.com/EddieAlvarez01/administrator_courses/models"
 
+	"github.com/EddieAlvarez01/administrator_courses/authorization"
 	"github.com/EddieAlvarez01/administrator_courses/dao/interfaces"
 
 	"github.com/go-playground/validator/v10"
@@ -115,5 +116,56 @@ func (p personHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		models.NewResponseJSON(w, http.StatusBadRequest, "Password incorrect", nil)
 		return
 	}
+	token, err := authorization.GenerateToken(*findPerson)
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusInternalServerError, "Error when generating token", nil)
+		return
+	}
+	findPerson.Token = token
+	findPerson.Password = ""
+	models.NewResponseJSON(w, http.StatusOK, "OK", findPerson)
+}
+
+//Update (UPDATE A ACCOUNT PERSON)
+func (p personHandler) Update(w http.ResponseWriter, r *http.Request) {
+	req, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusBadRequest, "Invalid json", nil)
+		return
+	}
+	var personToUpdate models.Person
+	json.Unmarshal(req, &personToUpdate)
+	validate := validator.New()
+	err = validate.StructPartial(personToUpdate, "Email", "Phone", "Address")
+	payload := r.Context().Value("payload").(models.Payload)
+	person, err := p.Persondao.GetOne(payload.ID)
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusBadRequest, "Invalid id", nil)
+		return
+	}
+	if person == nil {
+		models.NewResponseJSON(w, http.StatusNotFound, "Person not found", nil)
+		return
+	}
+	if person.Email != personToUpdate.Email {
+		if !p.verifyEmail(personToUpdate.Email) {
+			models.NewResponseJSON(w, http.StatusBadRequest, "This email already taken", nil)
+			return
+		}
+		person.Email = personToUpdate.Email
+	}
+	person.Address = personToUpdate.Address
+	person.Phone = personToUpdate.Phone
+	err = p.Persondao.Update(person)
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusInternalServerError, "Error when updating a person", nil)
+		return
+	}
+	person.Password = ""
 	models.NewResponseJSON(w, http.StatusOK, "OK", person)
+}
+
+func (p personHandler) verifyEmail(email string) bool{
+	findPerson := p.Persondao.GetByEmail(email)
+	return findPerson == nil
 }

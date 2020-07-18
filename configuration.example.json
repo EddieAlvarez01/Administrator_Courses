@@ -1,0 +1,5 @@
+{
+  "engine": "name_db",
+  "server": "address",
+  "port": "port"
+}

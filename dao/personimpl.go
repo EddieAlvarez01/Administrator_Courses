@@ -39,10 +39,22 @@ func (dao PersonImpl) Create(p *models.Person) error {
 }
 
 //Update (UPDATE DATA OF THE USERS)
-func (dao PersonImpl) Update(id int) (*models.Person, error) {
-	client, _ := dao.initDb()
+func (dao PersonImpl) Update(person *models.Person) error {
+	client, personsCollection := dao.initDb()
 	defer client.Disconnect(context.TODO())
-	return nil, nil
+	filter := bson.D{{"_id", person.ID}}
+	_, err := personsCollection.UpdateOne(context.TODO(), filter, bson.D{
+		{"$set", bson.D{
+			{"email", person.Email},
+			{"address", person.Address},
+			{"phone", person.Phone},
+		}},
+	})
+	if err != nil{
+		fmt.Println(err.Error())
+		return err
+	}
+	return nil
 }
 
 //GetOne (GET A ONE USER OF DB)

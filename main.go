@@ -23,6 +23,7 @@ func main() {
 	r := mux.NewRouter()
 	router := r.PathPrefix("/api").Subrouter()
 	routes.RegisterRoutesPersons(router, dao.PersonImpl{})
+	routes.RegisterRoutesCourses(router, dao.CourseImpl{})
 
 	//SERVER
 	fmt.Println("Server on port 7000")

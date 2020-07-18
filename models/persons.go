@@ -10,8 +10,8 @@ import (
 )
 
 type assignment struct {
-	id   primitive.ObjectID `bson:"section_id,omitempty" json:"section_id" validate:"required"`
-	date time.Time          `bson:"data,omitempty" json:"date" validate:"required"`
+	ID   primitive.ObjectID `bson:"section_id,omitempty" json:"section_id" validate:"required"`
+	Date time.Time          `bson:"data,omitempty" json:"date" validate:"required"`
 }
 
 //Person .
@@ -27,6 +27,7 @@ type Person struct {
 	Role        []string           `bson:"role,omitempty" json:"role" validate:"required,ne=0"`
 	Phone       uint64             `bson:"phone,omitempty" json:"phone" validate:"numeric"`
 	Assignments []assignment       `bson:"assignments" json:"assignments"`
+	Token 		string 				`bson:"-" json:"token,omitempty"`
 }
 
 //Encrypt (ENCRYPT PASSWORD)

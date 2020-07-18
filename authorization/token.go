@@ -30,17 +30,24 @@ func GenerateToken(payload models.Person) (string, error) {
 
 //VerifyToken MIDDLEWARE VERIFY TOKEN
 func VerifyToken(tokenString string) (models.Payload, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+	token, err := jwt.ParseWithClaims(tokenString, &models.Payload{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 		return verifyKey, nil
 	})
 	if err != nil {
+		fmt.Println(err.Error())
 		return models.Payload{}, err
 	}
-	if payload, ok := token.Claims.(models.Payload); ok && token.Valid {
-		return payload, nil
+	payload, ok := token.Claims.(*models.Payload)
+	if !token.Valid {
+		fmt.Println("Invalid token")
+		return models.Payload{}, errors.New("Invalid token")
 	}
-	return models.Payload{}, errors.New("Invalid token")
+	if !ok {
+		fmt.Println("Error getting the payload")
+		return models.Payload{}, errors.New("Error getting the payload")
+	}
+	return *payload, nil
 }

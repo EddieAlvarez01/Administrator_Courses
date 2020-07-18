@@ -9,7 +9,7 @@ import (
 //PersonDao .
 type PersonDao interface {
 	Create(p *models.Person) error
-	Update(id int) (*models.Person, error)
+	Update(person *models.Person) error
 	GetOne(id string) (*models.Person, error)
 	GetAllByFilter(filter interface{}, opt *options.FindOptions) ([]*models.Person, error)
 	GetByEmail(email string) *models.Person
