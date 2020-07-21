@@ -165,6 +165,44 @@ func (p personHandler) Update(w http.ResponseWriter, r *http.Request) {
 	models.NewResponseJSON(w, http.StatusOK, "OK", person)
 }
 
+//CREATE A NEW PROFESSOR
+func (p personHandler) CreateProfessor(w http.ResponseWriter, r *http.Request) {
+	req, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusBadRequest, "Invalid json", nil)
+		return
+	}
+	var person models.Person
+	err = json.Unmarshal(req, &person)
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusBadRequest, "Invalid json", nil)
+		return
+	}
+	validate := validator.New()
+	err = validate.StructExcept(person, "Card", "Role")
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusBadRequest, fmt.Sprintf("Errors: %v", err.(validator.ValidationErrors)), nil)
+		return
+	}
+	if !p.verifyEmail(person.Email) {
+		models.NewResponseJSON(w, http.StatusBadRequest, "The email already taken", nil)
+		return
+	}
+	person.Card = 0
+	person.Role = []string{"PROFESSOR"}
+	err = person.Encrypt()
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusInternalServerError, "Error in server", nil)
+		return
+	}
+	err = p.Persondao.CreateProffesor(&person)
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusInternalServerError, "Error in server", nil)
+		return
+	}
+	models.NewResponseJSON(w, http.StatusCreated, "Professor created successfully", nil)
+}
+
 func (p personHandler) verifyEmail(email string) bool{
 	findPerson := p.Persondao.GetByEmail(email)
 	return findPerson == nil

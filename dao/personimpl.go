@@ -107,3 +107,14 @@ func (dao PersonImpl) GetByEmail(email string) *models.Person {
 	}
 	return &person
 }
+
+//CREATE A NEW TEACHER
+func (dao PersonImpl) CreateProffesor(person *models.Person) error {
+	client, personsCollection := dao.initDb()
+	defer client.Disconnect(context.TODO())
+	_, err := personsCollection.InsertOne(context.TODO(), person)
+	if err != nil  {
+		fmt.Println(err.Error())
+	}
+	return err
+}

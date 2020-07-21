@@ -24,6 +24,7 @@ func main() {
 	router := r.PathPrefix("/api").Subrouter()
 	routes.RegisterRoutesPersons(router, dao.PersonImpl{})
 	routes.RegisterRoutesCourses(router, dao.CourseImpl{})
+	routes.RegisterRoutesSection(router, dao.SectionImpl{})
 
 	//SERVER
 	fmt.Println("Server on port 7000")
