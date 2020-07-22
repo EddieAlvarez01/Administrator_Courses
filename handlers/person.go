@@ -195,12 +195,28 @@ func (p personHandler) CreateProfessor(w http.ResponseWriter, r *http.Request) {
 		models.NewResponseJSON(w, http.StatusInternalServerError, "Error in server", nil)
 		return
 	}
-	err = p.Persondao.CreateProffesor(&person)
+	err = p.Persondao.CreateProfessor(&person)
 	if err != nil {
 		models.NewResponseJSON(w, http.StatusInternalServerError, "Error in server", nil)
 		return
 	}
 	models.NewResponseJSON(w, http.StatusCreated, "Professor created successfully", nil)
+}
+
+//ASSIGN A COURSE
+func (p personHandler) CourseAssignment(w http.ResponseWriter, r *http.Request) {
+	req, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusBadRequest, "Invalid json", nil)
+		return
+	}
+	var assigment models.Assignment
+	err = json.Unmarshal(req, &assigment)
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusBadRequest, "Invalid json", nil)
+		return
+	}
+
 }
 
 func (p personHandler) verifyEmail(email string) bool{

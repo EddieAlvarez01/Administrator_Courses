@@ -16,5 +16,5 @@ func RegisterRoutesPersons(mux *mux.Router, person interfaces.PersonDao) {
 	mux.HandleFunc("/persons/{id}", handler.GetOne).Methods(http.MethodGet)
 	mux.HandleFunc("/persons/signin", handler.SignIn).Methods(http.MethodPost)
 	mux.Handle("/persons/update", middlewares.Authenticate(http.HandlerFunc(handler.Update))).Methods(http.MethodPut)
-	mux.Handle("/persons/new-professor", middlewares.Authenticate(middlewares.RoleAdministrator(http.HandlerFunc(handler.CreateProfessor)))).Methods(http.MethodPost)
+	mux.Handle("/persons/new-professor", middlewares.Authenticate(middlewares.PersonRole(http.HandlerFunc(handler.CreateProfessor), 0))).Methods(http.MethodPost)
 }

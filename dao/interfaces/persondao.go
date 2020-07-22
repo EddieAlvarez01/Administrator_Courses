@@ -13,5 +13,5 @@ type PersonDao interface {
 	GetOne(id string) (*models.Person, error)
 	GetAllByFilter(filter interface{}, opt *options.FindOptions) ([]*models.Person, error)
 	GetByEmail(email string) *models.Person
-	CreateProffesor(p *models.Person) error
+	CreateProfessor(p *models.Person) error
 }

@@ -109,7 +109,7 @@ func (dao PersonImpl) GetByEmail(email string) *models.Person {
 }
 
 //CREATE A NEW TEACHER
-func (dao PersonImpl) CreateProffesor(person *models.Person) error {
+func (dao PersonImpl) CreateProfessor(person *models.Person) error {
 	client, personsCollection := dao.initDb()
 	defer client.Disconnect(context.TODO())
 	_, err := personsCollection.InsertOne(context.TODO(), person)

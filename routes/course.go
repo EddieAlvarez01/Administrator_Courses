@@ -11,6 +11,6 @@ import (
 //RegisterRoutesCourses REGISTER ALL ROUTES FOR COURSES
 func RegisterRoutesCourses(mux *mux.Router, courseImpl dao.CourseImpl) {
 	handler := handlers.NewCourseHandler(courseImpl)
-	mux.Handle("/courses", middlewares.Authenticate(middlewares.RoleAdministrator(http.HandlerFunc(handler.Create)))).Methods(http.MethodPost)
-	mux.Handle("/courses/{id}", middlewares.Authenticate(middlewares.RoleAdministrator(http.HandlerFunc(handler.Update)))).Methods(http.MethodPut)
+	mux.Handle("/courses", middlewares.Authenticate(middlewares.PersonRole(http.HandlerFunc(handler.Create), 0))).Methods(http.MethodPost)
+	mux.Handle("/courses/{id}", middlewares.Authenticate(middlewares.PersonRole(http.HandlerFunc(handler.Update), 0))).Methods(http.MethodPut)
 }

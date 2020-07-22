@@ -25,6 +25,7 @@ func main() {
 	routes.RegisterRoutesPersons(router, dao.PersonImpl{})
 	routes.RegisterRoutesCourses(router, dao.CourseImpl{})
 	routes.RegisterRoutesSection(router, dao.SectionImpl{})
+	routes.RegisterRoutesAssignment(router, dao.AssignmentImpl{})
 
 	//SERVER
 	fmt.Println("Server on port 7000")

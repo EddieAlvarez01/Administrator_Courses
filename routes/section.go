@@ -10,6 +10,6 @@ import (
 
 func RegisterRoutesSection(muxer *mux.Router, sectionImpl dao.SectionImpl){
 	handler := handlers.NewSectionHandler(sectionImpl)
-	muxer.Handle("/sections", middlewares.Authenticate(middlewares.RoleAdministrator(http.HandlerFunc(handler.Create)))).Methods(http.MethodPost)
-	muxer.Handle("/sections/{id}", middlewares.Authenticate(middlewares.RoleAdministrator(http.HandlerFunc(handler.Update)))).Methods(http.MethodPut)
+	muxer.Handle("/sections", middlewares.Authenticate(middlewares.PersonRole(http.HandlerFunc(handler.Create), 0))).Methods(http.MethodPost)
+	muxer.Handle("/sections/{id}", middlewares.Authenticate(middlewares.PersonRole(http.HandlerFunc(handler.Update), 0))).Methods(http.MethodPut)
 }

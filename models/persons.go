@@ -9,11 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type assignment struct {
-	ID   primitive.ObjectID `bson:"section_id,omitempty" json:"section_id" validate:"required"`
-	Date time.Time          `bson:"data,omitempty" json:"date" validate:"required"`
-}
-
 //Person .
 type Person struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
@@ -26,7 +21,6 @@ type Person struct {
 	Birthdate   time.Time          `bson:"birthdate,omitempty" json:"birthdate" validate:"required"`
 	Role        []string           `bson:"role,omitempty" json:"role" validate:"required,ne=0"`
 	Phone       uint64             `bson:"phone,omitempty" json:"phone" validate:"numeric"`
-	Assignments []assignment       `bson:"assignments" json:"assignments"`
 	Token 		string 				`bson:"-" json:"token,omitempty"`
 }
 
