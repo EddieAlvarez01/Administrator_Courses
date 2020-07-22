@@ -13,4 +13,5 @@ func RegisterRoutesCourses(mux *mux.Router, courseImpl dao.CourseImpl) {
 	handler := handlers.NewCourseHandler(courseImpl)
 	mux.Handle("/courses", middlewares.Authenticate(middlewares.PersonRole(http.HandlerFunc(handler.Create), 0))).Methods(http.MethodPost)
 	mux.Handle("/courses/{id}", middlewares.Authenticate(middlewares.PersonRole(http.HandlerFunc(handler.Update), 0))).Methods(http.MethodPut)
+	mux.HandleFunc("/courses", handler.GetAll).Methods(http.MethodGet)
 }

@@ -11,4 +11,5 @@ type SectionDao interface {
 	GetProfessor(idProfessor primitive.ObjectID) *models.Person
 	Update(section *models.Section) error
 	GetById(id string) (*models.Section, error)
+	GetAllByCourseID(id primitive.ObjectID) ([]models.Section, error)
 }

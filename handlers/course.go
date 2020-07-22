@@ -77,3 +77,13 @@ func (c courseHandler) Update(w http.ResponseWriter, r *http.Request) {
 	models.NewResponseJSON(w, http.StatusOK, "OK", course)
 }
 
+//GET ALL COURSES
+func (c courseHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+	courses, err := c.CourseDao.GetAll()
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusInternalServerError, "Server error", nil)
+		return
+	}
+	models.NewResponseJSON(w, http.StatusOK, "OK", courses)
+}
+

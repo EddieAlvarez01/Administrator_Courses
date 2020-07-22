@@ -7,6 +7,7 @@ import (
 	"github.com/EddieAlvarez01/administrator_courses/models"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -149,6 +150,22 @@ func (s sectionHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	models.NewResponseJSON(w, http.StatusOK, "OK", sectionToUpdate)
+}
+
+//GET ALL SECTIONS OF A COURSE
+func (s sectionHandler) GetAllByCourseID(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	objectID, err := primitive.ObjectIDFromHex(params["id"])
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusBadRequest, "Invalid id", nil)
+		return
+	}
+	sections, err := s.SectionDao.GetAllByCourseID(objectID)
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusInternalServerError, "Server error", nil)
+		return
+	}
+	models.NewResponseJSON(w, http.StatusOK, "OK", sections)
 }
 
 //VALIDATE COURSE SCHEDULE

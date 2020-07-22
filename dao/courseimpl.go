@@ -73,3 +73,20 @@ func (c CourseImpl) Update(course *models.Course) error {
 	}
 	return nil
 }
+
+//GET ALL COURSES
+func (c CourseImpl) GetAll() ([]*models.Course, error) {
+	client, coursesCollection := c.initDB()
+	defer client.Disconnect(context.TODO())
+	var courses []*models.Course
+	cursor, err := coursesCollection.Find(context.TODO(), bson.M{})
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	if err = cursor.All(context.TODO(), &courses); err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	return courses, nil
+}

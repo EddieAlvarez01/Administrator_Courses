@@ -12,4 +12,5 @@ func RegisterRoutesSection(muxer *mux.Router, sectionImpl dao.SectionImpl){
 	handler := handlers.NewSectionHandler(sectionImpl)
 	muxer.Handle("/sections", middlewares.Authenticate(middlewares.PersonRole(http.HandlerFunc(handler.Create), 0))).Methods(http.MethodPost)
 	muxer.Handle("/sections/{id}", middlewares.Authenticate(middlewares.PersonRole(http.HandlerFunc(handler.Update), 0))).Methods(http.MethodPut)
+	muxer.HandleFunc("/sections/course/{id}", handler.GetAllByCourseID).Methods(http.MethodGet)
 }

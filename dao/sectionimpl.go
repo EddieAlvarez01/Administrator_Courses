@@ -104,3 +104,30 @@ func (s SectionImpl) GetById(id string) (*models.Section, error) {
 	}
 	return &section, nil
 }
+
+//GET ALL SECTIONS BY COURSE ID
+func (s SectionImpl) GetAllByCourseID(id primitive.ObjectID) ([]models.Section, error) {
+	client, sectionsCollection := s.initDB()
+	defer client.Disconnect(context.TODO())
+	filter := bson.D{
+		{"$match", bson.D{{"course_id", id}}},
+	}
+	lookup := bson.D{{"$lookup", bson.D{{"from", "courses"}, {"localField", "course_id"}, {"foreignField", "_id"}, {"as", "course"}}}}
+	unwind := bson.D{
+		{"$unwind", bson.D{
+			{"path", "$course"},
+			{"preserveNullAndEmptyArrays", false},
+		}},
+	}
+	var sections []models.Section
+	cursor, err := sectionsCollection.Aggregate(context.TODO(), mongo.Pipeline{filter, lookup, unwind})
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	if err = cursor.All(context.TODO(), &sections); err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	return sections, nil
+}

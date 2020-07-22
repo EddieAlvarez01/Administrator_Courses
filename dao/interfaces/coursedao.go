@@ -6,4 +6,5 @@ type CourseDao interface {
 	Create(course *models.Course) error
 	GetById(id string) (*models.Course, error)
 	Update(course *models.Course) error
+	GetAll() ([]*models.Course, error)
 }
