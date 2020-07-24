@@ -3,7 +3,9 @@ package dao
 import (
 	"context"
 	"fmt"
+	"github.com/EddieAlvarez01/administrator_courses/dao/interfaces"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -117,4 +119,21 @@ func (dao PersonImpl) CreateProfessor(person *models.Person) error {
 		fmt.Println(err.Error())
 	}
 	return err
+}
+
+//GET ALL PERSONS OF A SECTION
+func (dao PersonImpl) GetAllBySectionID(sectionID primitive.ObjectID, startDate, endDate time.Time) ([]*models.Person, error) {
+	var assignmentdao interfaces.AssignmentDao = AssignmentImpl{}
+	assignments, err := assignmentdao.GetAllBySectionIdInAPeriod(sectionID, startDate, endDate)
+	if err != nil {
+		return nil, err
+	}
+	var persons []*models.Person
+	if assignments != nil {
+		for _, assignment := range assignments {
+			assignment.Person.Password = ""
+			persons = append(persons, &assignment.Person)
+		}
+	}
+	return persons, nil
 }

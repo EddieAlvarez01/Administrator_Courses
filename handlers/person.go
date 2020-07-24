@@ -3,8 +3,10 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 
@@ -217,6 +219,32 @@ func (p personHandler) CourseAssignment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+}
+
+//GET ALL THE PEOPLE IN A COURSE FOR A PERIOD
+func (p personHandler) GetAllBySectionIDAndDateRange(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	objectID, err := primitive.ObjectIDFromHex(params["id"])
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusBadRequest, "Invalid id", nil)
+		return
+	}
+	startDate, err := time.Parse("2006-01-02", params["startDate"])
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusBadRequest, "Date format invalid in 'startDate'", nil)
+		return
+	}
+	endDate, err := time.Parse("2006-01-02", params["endDate"])
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusBadRequest, "Date format invalid in 'endDate'", nil)
+		return
+	}
+	persons, err := p.Persondao.GetAllBySectionID(objectID, startDate, endDate)
+	if err != nil {
+		models.NewResponseJSON(w, http.StatusInternalServerError, "Server error", nil)
+		return
+	}
+	models.NewResponseJSON(w, http.StatusOK, "OK", persons)
 }
 
 func (p personHandler) verifyEmail(email string) bool{

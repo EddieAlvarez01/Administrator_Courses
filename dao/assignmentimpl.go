@@ -36,6 +36,25 @@ func (dao AssignmentImpl) Create(assigment *models.Assignment) error {
 	return err
 }
 
+//UPDATE ASSIGNMENT
+func (dao AssignmentImpl) Update(assignment *models.Assignment) error {
+	client, assignmentsCollection := dao.initDB()
+	defer client.Disconnect(context.TODO())
+	filter := bson.D{
+		{"_id", assignment.ID},
+	}
+	update := bson.D{
+		{"$set", bson.D{
+			{"courses", assignment.Courses},
+		}},
+	}
+	_, err := assignmentsCollection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	return err
+}
+
 //GET ASSIGNMENT BY PERSON ID AND DATE RANGE
 func (dao AssignmentImpl) GetByPersonAndDateRange(idPerson string, startDate, endDate time.Time) (*models.Assignment, error) {
 	client, assignmentsCollection := dao.initDB()
@@ -57,4 +76,62 @@ func (dao AssignmentImpl) GetByPersonAndDateRange(idPerson string, startDate, en
 		return nil, nil
 	}
 	return &assigment, nil
+}
+
+//GET ASSIGNMENT BY ID IN A PERIOD
+func (dao AssignmentImpl) GetById(assignmentId string) (*models.Assignment, error) {
+	client, assignmentsCollection := dao.initDB()
+	defer client.Disconnect(context.TODO())
+	objectID, err := primitive.ObjectIDFromHex(assignmentId)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.D{
+		{"_id", objectID},
+	}
+	var assignment models.Assignment
+	err = assignmentsCollection.FindOne(context.TODO(), filter).Decode(&assignment)
+	if err != nil {
+		return nil, nil
+	}
+	return &assignment, nil
+}
+
+//GET ALL ASSIGNMENTS IN A PERIOD
+func (dao AssignmentImpl) GetAllBySectionIdInAPeriod(sectionID primitive.ObjectID, startDate, endDate time.Time) ([]*models.Assignment, error) {
+	client, assignmentsCollection := dao.initDB()
+	defer client.Disconnect(context.TODO())
+	match := bson.D{
+		{"$match", bson.D{
+			{"courses", sectionID},
+			{"date", bson.D{
+				{"$gt", startDate},
+				{"$lt", endDate},
+			}},
+		}},
+	}
+	lookup := bson.D{
+		{"$lookup", bson.D{
+			{"from", "persons"},
+			{"localField", "person_id"},
+			{"foreignField", "_id"},
+			{"as", "person"},
+		}}}
+	unwind := bson.D{
+		{"$unwind", bson.D{
+			{"path", "$person"},
+			{"preserveNullAndEmptyArrays", false},
+		}},
+	}
+	var assignments []*models.Assignment
+	cursor, err := assignmentsCollection.Aggregate(context.TODO(), mongo.Pipeline{match, lookup, unwind})
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	if err = cursor.All(context.TODO(), &assignments); err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	return assignments, nil
 }

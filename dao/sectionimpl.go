@@ -95,13 +95,27 @@ func (s SectionImpl) GetById(id string) (*models.Section, error) {
 	client, sectionsCollection := s.initDB()
 	defer client.Disconnect(context.TODO())
 	filter := bson.D{
-		{"_id", objectID},
+		{"$match", bson.D{
+			{"_id", objectID},
+		}},
+	}
+	lookup := bson.D{{"$lookup", bson.D{{"from", "courses"}, {"localField", "course_id"}, {"foreignField", "_id"}, {"as", "course"}}}}
+	unwind := bson.D{
+		{"$unwind", bson.D{
+			{"path", "$course"},
+			{"preserveNullAndEmptyArrays", false},
+		}},
 	}
 	var section models.Section
-	err = sectionsCollection.FindOne(context.TODO(), filter).Decode(&section)
+	cursor, err := sectionsCollection.Aggregate(context.TODO(), mongo.Pipeline{filter, lookup, unwind})
 	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	if cursor == nil {
 		return nil, nil
 	}
+	_ = cursor.Decode(&section)
 	return &section, nil
 }
 

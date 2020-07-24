@@ -2,6 +2,8 @@ package interfaces
 
 import (
 	"github.com/EddieAlvarez01/administrator_courses/models"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -14,4 +16,5 @@ type PersonDao interface {
 	GetAllByFilter(filter interface{}, opt *options.FindOptions) ([]*models.Person, error)
 	GetByEmail(email string) *models.Person
 	CreateProfessor(p *models.Person) error
+	GetAllBySectionID(sectionID primitive.ObjectID, startDate, endDate time.Time) ([]*models.Person, error)
 }

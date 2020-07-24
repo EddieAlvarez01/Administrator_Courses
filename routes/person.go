@@ -17,4 +17,5 @@ func RegisterRoutesPersons(mux *mux.Router, person interfaces.PersonDao) {
 	mux.HandleFunc("/persons/signin", handler.SignIn).Methods(http.MethodPost)
 	mux.Handle("/persons/update", middlewares.Authenticate(http.HandlerFunc(handler.Update))).Methods(http.MethodPut)
 	mux.Handle("/persons/new-professor", middlewares.Authenticate(middlewares.PersonRole(http.HandlerFunc(handler.CreateProfessor), 0))).Methods(http.MethodPost)
+	mux.HandleFunc("/persons/section/{id}/{startDate}/{endDate}", handler.GetAllBySectionIDAndDateRange).Methods(http.MethodGet)
 }

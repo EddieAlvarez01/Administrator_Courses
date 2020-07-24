@@ -11,4 +11,7 @@ import (
 func RegisterRoutesAssignment(mux *mux.Router, assignmentImpl dao.AssignmentImpl) {
 	handler := handlers.NewAssignmentHandler(assignmentImpl)
 	mux.Handle("/assignments", middlewares.Authenticate(middlewares.PersonRole(http.HandlerFunc(handler.Create), 1))).Methods(http.MethodPost)
+	mux.Handle("/assignments/{id}", middlewares.Authenticate(middlewares.PersonRole(http.HandlerFunc(handler.Update), 1))).Methods(http.MethodPut)
+	mux.Handle("/assignments/person", middlewares.Authenticate(http.HandlerFunc(handler.GetAssignmentInOnePeriod))).Methods(http.MethodGet)
+	mux.Handle("/assignments/person/{startDate}/{endDate}", middlewares.Authenticate(http.HandlerFunc(handler.GetAssignmentInOnePeriod))).Methods(http.MethodGet)
 }
